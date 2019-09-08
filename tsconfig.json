@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "node",
+    "target": "es5",
+    "declaration": false,
+    "noImplicitAny": false,
+    "allowJs": false,
+    "sourceMap": true,
+    "noImplicitReturns": true,
+    "allowSyntheticDefaultImports": true,
+    "lib": [ "dom", "es2015" ]
+  },
+  "exclude": [ "node_modules" ]
+}
