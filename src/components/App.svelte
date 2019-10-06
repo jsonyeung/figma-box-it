@@ -1,17 +1,29 @@
 <script>
+  import { postMessage } from 'ui'
+
   const padding = {
-    pt: 0, pb: 0,
-    pl: 0, pr: 0
+    pt: 8, pb: 8,
+    pl: 8, pr: 8
   }
+
+  $: padding, (postMessage({
+      type: 'update',
+      payload: padding
+    })
+  )
 
   function submit(e) {
     e.preventDefault()
-    parent.postMessage({ 
-      pluginMessage: {
-        type: 'create',
-        payload: padding
-      }
-    }, '*')
+    postMessage({ 
+      type: 'confirm',
+      payload: padding
+    })
+  }
+
+  function cancel() {
+    postMessage({
+      type: 'cancel'
+    })
   }
 </script>
 
@@ -30,5 +42,6 @@
     <input bind:value={padding.pl} type='number'/>
   </div>
 
-  <button type='submit'>Create</button>
+  <button on:click={cancel} type='button'>Cancel</button>
+  <button type='submit'>Confirm</button>
 </form>
