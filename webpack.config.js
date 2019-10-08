@@ -31,13 +31,28 @@ module.exports = {
           options: {
             preprocess: sveltePreprocess()
           }
-        },
-        exclude: /node_modules/ 
+        }, 
+        exclude: /node_modules/
       },
 
       // SCSS
       { test: /\.scss?$/,
-        use: ['style-loader', 'css-loader', 'sass-loader']
+        use: [
+          'style-loader', 
+          'css-loader',
+          'postcss-loader',
+          'sass-loader'
+        ]
+      },
+
+      // SVG Icons
+      { test: /\.svg?$/, 
+        use: {
+          loader: 'svg-inline-loader',
+          options: {
+            removeSVGTagAttrs: false
+          }
+        } 
       }
     ]
   },
@@ -53,8 +68,8 @@ module.exports = {
   ],
 
   resolve: {
-    modules: [path.resolve(__dirname, 'src'), 'node_modules'],
-    extensions: ['.js', '.ts', '.svelte'],
+    modules: [path.resolve(__dirname, 'src'), 'node_modules', __dirname],
+    extensions: ['.mjs', '.js', '.ts', '.svelte'],
     mainFields: ['svelte', 'module', 'main']
   }
 }

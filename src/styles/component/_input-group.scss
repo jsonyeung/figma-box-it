@@ -1,0 +1,41 @@
+.input-group {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+
+  border: 1px solid transparent;
+  border-radius: $border-radius-small;
+
+  &:hover {
+    border: 1px solid $figma-black-1;
+    & > *:not(:first-of-type) { border-left: 1px solid $figma-black-1; }
+  }
+
+  &.active {
+    @extend .input-group:hover;
+    border: 2px solid $figma-blue;
+
+    .input-group__icon {
+      color: $figma-blue;
+      svg path { fill: $figma-blue }
+    }
+  }
+
+  & > *, .input { 
+    margin: 0;
+    border: none;
+  }
+}
+
+.input-group__icon {
+  padding-left: 8px;
+  padding-right: 4px;
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  color: $figma-black-3;
+
+  &:empty { display: none; }
+}

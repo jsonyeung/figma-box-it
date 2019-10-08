@@ -9,7 +9,7 @@
     "sourceMap": true,
     "noImplicitReturns": true,
     "allowSyntheticDefaultImports": true,
-    "lib": [ "dom", "es2015" ]
+    "lib": [ "dom", "es2016" ]
   },
   "exclude": [ "node_modules" ]
 }

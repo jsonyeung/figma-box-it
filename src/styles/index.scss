@@ -1,0 +1,11 @@
+// Figma Design System:
+// https://github.com/thomas-lowry/figma-plugin-ds/tree/master/scss
+
+@import 'base/base';
+@import 'base/mixins';
+@import 'base/typography';
+@import 'base/variables';
+
+@import 'component/button';
+@import 'component/input';
+@import 'component/input-group';

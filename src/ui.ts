@@ -6,11 +6,11 @@ const app = new App({
   target: document.getElementById('root')
 })
 
-// UI Event Trigger
-export function postMessage(obj, opt) {
+// UI Event Dispatch
+export function postMessage(obj, opt='*') {
   parent.postMessage({
     pluginMessage: obj
-  }, (opt || '*'))
+  }, opt)
 }
 
 export default app
