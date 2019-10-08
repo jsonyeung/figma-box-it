@@ -31,9 +31,6 @@ const target = selection[0]
 const group = ((selection.length - Number(!isNewBox)) === 1) ?
   target : figma.group(selection, target.parent)
 
-group.parent.appendChild(box)
-group.parent.appendChild(group)
-
 // Save group & box dimensions
 const prevDim: Record<string, Dim> = {
   box: getDim(box)
@@ -57,6 +54,11 @@ function updateBox(padding: Padding): void {
     h: Math.max((height + pt + pb), 2),
     x: (x - pl),
     y: (y - pt)
+  }
+
+  if (box.parent !== group.parent) {
+    group.parent.appendChild(box)
+    group.parent.appendChild(group)
   }
 
   box.resize(dim.w, dim.h)
