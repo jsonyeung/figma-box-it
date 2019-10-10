@@ -59,8 +59,9 @@ function updateBox(padding: Padding): void {
   }
 
   if (box.parent !== group.parent) {
-    group.parent.appendChild(box)
-    group.parent.appendChild(group)
+    group.parent.insertChild(0, box)
+    // group.parent.appendChild(box)
+    // group.parent.appendChild(group)
   }
 
   box.resize(dim.w, dim.h)
