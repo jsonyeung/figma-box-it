@@ -13,10 +13,12 @@ const box: SceneNode = setBoxEl()
 makeSelection(selection.concat(box))
 
 function setBoxEl(): SceneNode {
-  for (const node of selection) {
+  for (const [i, node] of selection.entries()) {
     if (selection.length <= 1) break
-    if (node.name.endsWith(':boxed'))
+    if (node.name.endsWith(':boxed')) {
+      selection.splice(i, 1)
       return node
+    }
   }
 
   const newBox = figma.createRectangle()
@@ -28,7 +30,7 @@ function setBoxEl(): SceneNode {
 
 // Get Group selection
 const target = selection[0]
-const group = ((selection.length - Number(!isNewBox)) === 1) ?
+const group = (selection.length === 1) ?
   target : figma.group(selection, target.parent)
 
 // Save group & box dimensions
