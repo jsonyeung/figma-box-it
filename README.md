@@ -1,19 +1,21 @@
+![Box-It Logo](https://raw.githubusercontent.com/jsonyeung/figma-box-it/develop/docs/logo.svg?sanitize=true)
+
 # Figma Box It
-A Figma plugin to create boxing with padding effortlessly.
+A Figma plugin to create a bounding boxes with padding effortlessly.
 
 
 ## Usage
 1. Select 1 or more layers
 2. Run Box It (Menu > Plugins > 📦 Box It)
 
+![Box-It Demo Gif](https://raw.githubusercontent.com/jsonyeung/figma-box-it/develop/docs/box-it-demo.gif)
 
-
-Box It will automatically group selections of 2+ layers and generate a box with padding.
+Box It will automatically group selections of 2+ layers and bounds a box with padding.
 
 
 **Using your own box layer**
 
-Apply the `:boxed` suffix to the end of your layer name and Box it will automatically use the first :boxed element found in your selection
+Apply the `:boxed` suffix to the end of your layer name and Box It will automatically use the first :boxed element in your selection
 
 
 ## Installation & Development
