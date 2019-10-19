@@ -2,6 +2,14 @@ const UI_CONF = { width: 168, height: 132 }
 figma.showUI(__html__, UI_CONF)
 
 const selection: SceneNode[] = [...figma.currentPage.selection]
+checkValidSelection()
+
+function checkValidSelection() {
+  if (selection.length <= 0) {
+    figma.notify('📦 Box It: Please select at least 1 layer to box.')
+    figma.closePlugin()
+  }
+}
 
 function makeSelection(val: SceneNode[]): void {
   figma.currentPage.selection = val
@@ -30,8 +38,8 @@ function setBoxEl(): SceneNode {
 
 // Get Group selection
 const target = selection[0]
-const group = (selection.length === 1) ?
-  target : figma.group(selection, target.parent)
+const group = (selection.length > 1) ?
+  figma.group(selection, target.parent) : target
 
 // Save group & box dimensions
 const prevDim: Record<string, Dim> = {
