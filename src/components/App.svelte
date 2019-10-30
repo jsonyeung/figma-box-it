@@ -11,8 +11,8 @@
 
   let lock = { x: false, y: false }
   let padding = {
-    pt: 12, pr: 12,
-    pb: 12, pl: 12
+    pt: 0, pr: 0,
+    pb: 0, pl: 0
   }
 
   // equalize x/y-axis padding when constrained
