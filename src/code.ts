@@ -2,113 +2,166 @@ const UI_CONF = { width: 168, height: 132 }
 figma.showUI(__html__, UI_CONF)
 
 const selection: SceneNode[] = [...figma.currentPage.selection]
-checkValidSelection()
+const target = selection[0]
 
-function checkValidSelection() {
+function isValidSelection(): boolean {
   if (selection.length <= 0) {
     figma.notify('📦 Box It: Please select at least 1 layer to box.')
-    figma.closePlugin()
+    return false
   }
+
+  for (const node of selection) {
+    if (node.parent !== target.parent) {
+      figma.notify('📦 Box It: All layers must be within the same Frame or Group.')
+      return false
+    }
+  }
+  
+  return true
 }
 
 function makeSelection(val: SceneNode[]): void {
   figma.currentPage.selection = val
 }
 
-// Set existing/new box
-let isNewBox: boolean = false
-const box: SceneNode = setBoxEl()
-makeSelection(selection.concat(box))
+// Run code only if selection is valid
+if (!isValidSelection()) figma.closePlugin()
+else {
 
-function setBoxEl(): SceneNode {
-  for (const [i, node] of selection.entries()) {
-    if (selection.length <= 1) break
-    if (node.name.endsWith(':boxed')) {
-      selection.splice(i, 1)
-      return node
+  // Save dimensions of selected layers
+  const prevDim: Record<string, Dim> = {}
+  for (const node of selection) {
+    prevDim[node.id] = getDim(node)
+  }
+
+  function getDim(el: SceneNode): Dim {
+    return {
+      w: el.width,
+      h: el.height,
+      x: el.x,
+      y: el.y
     }
   }
 
-  const newBox = figma.createRectangle()
-  newBox.name += ':boxed'
-  newBox.fills = [{ type: 'SOLID', color: { r: 0.75, g: 0.75, b: 0.75 } }]
-  isNewBox = true
-  return newBox
-}
+  // Get Bounding Box selection
+  let bbox = getBoundingBox()
 
-// Get Group selection
-const target = selection[0]
-const group = (selection.length > 1) ?
-  figma.group(selection, target.parent) : target
-
-// Save group & box dimensions
-const prevDim: Record<string, Dim> = {
-  box: getDim(box)
-}
-
-function getDim(el: SceneNode): Dim {
-  return {
-    w: el.width,
-    h: el.height,
-    x: el.x,
-    y: el.y
-  }
-}
-
-// Update Rectangle
-function updateBox(padding: Padding): void {
-  const { pt, pb, pl, pr } = padding
-  const { width, height, x, y } = group
-  const dim = {
-    w: Math.max((width  + pl + pr), 2),
-    h: Math.max((height + pt + pb), 2),
-    x: (x - pl),
-    y: (y - pt)
+  function getBoundingBox(): Dim {
+    const clone = []
+    for (const node of selection) {
+      if (node.removed) continue
+      const cnode = node.clone()
+      cnode.x = node.absoluteTransform[0][2]
+      cnode.y = node.absoluteTransform[1][2]
+      clone.push(cnode)
+    }
+    
+    const group = figma.group(clone, target.parent)
+    const bbox = getDim(group)
+    group.remove()
+    return bbox
   }
 
-  if (box.parent !== group.parent) {
-    group.parent.insertChild(0, box)
-    // group.parent.appendChild(box)
-    // group.parent.appendChild(group)
+  function updateBoundingBox(): void {
+    let updated = false;
+
+    for (const [i, node] of selection.entries()) {
+      const dim = prevDim[node.id]
+
+      if (node.removed) {
+        selection.splice(i, 1)
+        updated = true
+        
+      } else if (
+        (node.x !== dim.x) || (node.y !== dim.y) ||
+        (node.width !== dim.w) || (node.height !== dim.h)) {
+        prevDim[node.id] = getDim(node)
+        updated = true
+      }
+    }
+    
+    if (updated) bbox = getBoundingBox()
   }
 
-  box.resize(dim.w, dim.h)
-  if (dim.w > 2) box.x = dim.x
-  if (dim.h > 2) box.y = dim.y
-}
+  // Set existing/new box
+  let isNewBox: boolean = false
+  const box: SceneNode = getBoxEl()
 
-// Revert any dimensional changes
-function reset(): void {
-  const { w, h, x, y } = prevDim.box
-  box.resize(w, h)
-  box.x = x; box.y = y
+  prevDim.box = getDim(box)
+  bbox = getBoundingBox()
+  target.parent.insertChild(0, box)
+  makeSelection(selection.concat(box))
 
-  if (isNewBox) box.remove()
-}
+  function getBoxEl(): SceneNode {
+    for (const [i, node] of selection.entries()) {
+      if (selection.length <= 1) break
+      if (node.name.endsWith(':boxed')) {
+        selection.splice(i, 1)
+        return node
+      }
+    }
 
-// exit plugin if user modifies the group/box
-setInterval(() => {
-  if (group.removed || box.removed) figma.closePlugin()
-}, 1000 / 60)
+    const newBox = figma.createRectangle()
+    newBox.name += ':boxed'
+    newBox.fills = [{ type: 'SOLID', color: { r: 0.75, g: 0.75, b: 0.75 } }]
+    isNewBox = true
+    return newBox
+  }
 
+  // Update Box
+  function updateBox(padding: Padding): void {
+    updateBoundingBox()
 
-// Event Handler for UI
-figma.ui.onmessage = (msg) => {
-  const { type, payload } = msg
+    const { pt, pb, pl, pr } = padding
+    const { w, h, x, y } = bbox
+    const dim = {
+      w: Math.max((w + pl + pr), 2),
+      h: Math.max((h + pt + pb), 2),
+      x: (x - pl),
+      y: (y - pt)
+    }
+    
+    if (box.parent !== target.parent) {
+      target.parent.insertChild(0, box)
+    }
+    
+    box.resize(dim.w, dim.h)
+    if (dim.w > 2) box.x = dim.x
+    if (dim.h > 2) box.y = dim.y
+  }
 
-  switch(type) {
-    case 'update':
-      updateBox(payload)
-      makeSelection([box])
-      break
-    case 'confirm':
-      makeSelection(selection.concat(box))
-      figma.closePlugin()
-      break
-    case 'cancel':
-      reset()
-      figma.closePlugin()
+  // Revert any dimensional changes
+  function reset(): void {
+    const { w, h, x, y } = prevDim.box
+    box.resize(w, h)
+    box.x = x; box.y = y
 
-    default: break
+    if (isNewBox) box.remove()
+  }
+
+  // exit plugin if user modifies the group/box
+  setInterval(() => {
+    if (box.removed) figma.closePlugin()
+  }, 1000 / 60)
+
+  // Event Handler for UI
+  figma.ui.onmessage = (msg) => {
+    const { type, payload } = msg
+
+    switch(type) {
+      case 'update':
+        updateBox(payload)
+        makeSelection([box])
+        break
+      case 'confirm':
+        makeSelection(selection.concat(box))
+        figma.closePlugin()
+        break
+      case 'cancel':
+        reset()
+        figma.closePlugin()
+
+      default: break
+    }
   }
 }
