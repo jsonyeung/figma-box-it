@@ -12,9 +12,18 @@ function isValidSelection(): boolean {
 
   for (const node of selection) {
     if (node.parent !== target.parent) {
-      figma.notify('📦 Box It: All layers must be within the same Frame or Group.')
+      figma.notify('📦 Box It: Your selection must be within the same Frame or Group.')
       return false
     }
+  }
+
+  let parent = target.parent
+  while (parent.type !== 'PAGE') {
+    if (parent.type === 'INSTANCE') {
+      figma.notify('📦 Box It: Your selection cannot be within an Instance.')
+      return false
+    }
+    parent = parent.parent
   }
   
   return true
