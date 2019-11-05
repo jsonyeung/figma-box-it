@@ -3,6 +3,8 @@
 # Figma Box It
 A Figma plugin to create a bounding boxes with padding effortlessly.
 
+[Download Box-It on Figma](https://www.figma.com/c/plugin/752255901354332543/Box-It)
+
 
 ## Usage
 1. Select 1 or more layers
@@ -10,7 +12,7 @@ A Figma plugin to create a bounding boxes with padding effortlessly.
 
 ![Box-It Demo Gif](https://raw.githubusercontent.com/jsonyeung/figma-box-it/develop/docs/box-it-demo.gif)
 
-Box It will automatically group selections of 2+ layers and bounds a box with padding.
+Box It will bound a box around your selection and show a set of inputs to adjust the padding.
 
 
 **Using your own box layer**
