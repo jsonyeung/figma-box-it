@@ -2,7 +2,7 @@ const UI_CONF = { width: 168, height: 132 }
 figma.showUI(__html__, UI_CONF)
 
 const selection: SceneNode[] = [...figma.currentPage.selection]
-const target = selection[0].parent
+const target = (selection[0] || {}).parent
 
 function isValidSelection(): boolean {
   if (selection.length <= 0) {
