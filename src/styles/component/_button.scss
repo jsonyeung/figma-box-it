@@ -95,7 +95,7 @@
   background: none;
 
   &:hover { border-color: $figma-black-1; }
-  &:active, &:focus { border: 2px solid $figma-blue; }
+  &:active /*, &:focus */ { border: 2px solid $figma-blue; }
   &:active, &.active {
     &::before { background: $figma-black-1; }
   }
