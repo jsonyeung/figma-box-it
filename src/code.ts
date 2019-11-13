@@ -72,6 +72,7 @@ else {
   }
 
   function updateBoundingBox(): void {
+    if (selection.length <= 0) return
     let updated = false;
 
     for (const [i, node] of selection.entries()) {
@@ -89,7 +90,7 @@ else {
       }
     }
     
-    if (updated && selection.length) bbox = getBoundingBox()
+    if (updated) bbox = getBoundingBox()
   }
 
   // Set existing/new box
