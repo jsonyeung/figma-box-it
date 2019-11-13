@@ -2,7 +2,7 @@ const UI_CONF = { width: 168, height: 132 }
 figma.showUI(__html__, UI_CONF)
 
 const selection: SceneNode[] = [...figma.currentPage.selection]
-const target = selection[0]
+const target = selection[0].parent
 
 function isValidSelection(): boolean {
   if (selection.length <= 0) {
@@ -11,13 +11,13 @@ function isValidSelection(): boolean {
   }
 
   for (const node of selection) {
-    if (node.parent !== target.parent) {
+    if (node.parent !== target) {
       figma.notify('📦 Box It: Your selection must be within the same Frame or Group.')
       return false
     }
   }
 
-  let parent = target.parent
+  let parent = target
   while (parent.type !== 'PAGE') {
     if (parent.type === 'INSTANCE') {
       figma.notify('📦 Box It: Your selection cannot be within an Instance.')
@@ -53,7 +53,7 @@ else {
   }
 
   // Get Bounding Box selection
-  let bbox = getBoundingBox()
+  let bbox: Dim = getBoundingBox()
 
   function getBoundingBox(): Dim {
     const clone = []
@@ -65,7 +65,7 @@ else {
       clone.push(cnode)
     }
     
-    const group = figma.group(clone, target.parent)
+    const group = figma.group(clone, target)
     const bbox = getDim(group)
     group.remove()
     return bbox
@@ -89,7 +89,7 @@ else {
       }
     }
     
-    if (updated) bbox = getBoundingBox()
+    if (updated && selection.length) bbox = getBoundingBox()
   }
 
   // Set existing/new box
@@ -98,7 +98,7 @@ else {
 
   prevDim.box = getDim(box)
   bbox = getBoundingBox()
-  target.parent.insertChild(0, box)
+  target.insertChild(0, box)
   makeSelection(selection.concat(box))
 
   function getBoxEl(): SceneNode {
@@ -130,8 +130,8 @@ else {
       y: (y - pt)
     }
     
-    if (box.parent !== target.parent) {
-      target.parent.insertChild(0, box)
+    if (box.parent !== target) {
+      target.insertChild(0, box)
     }
     
     box.resize(dim.w, dim.h)
